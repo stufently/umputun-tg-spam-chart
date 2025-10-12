@@ -2,7 +2,7 @@ tgspam:
   image: ghcr.io/umputun/tg-spam:latest
   env:
     TELEGRAM_TOKEN: ""          
-    TELEGRAM_GROUP: "-2843099212"
+    TELEGRAM_GROUP: "-1002843099212"
     TZ: "America/Chicago"
     ADMIN_GROUP: "-4660067109"
     LOGGER_ENABLED: "true"
