@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reproxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reproxy
+  template:
+    metadata:
+      labels:
+        app: reproxy
+    spec:
+      containers:
+        - name: reproxy
+          image: {{ .Values.reproxy.image }}
+          env:
+            {{- range $key, $value := .Values.reproxy.env }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+          ports:
+            {{- range .Values.reproxy.ports }}
+            - name: {{ .name }}
+              containerPort: {{ .targetPort }}
+            {{- end }}
+          volumeMounts:
+            - name: logs
+              mountPath: /srv/logs
+            - name: ssl
+              mountPath: /srv/ssl
+            - name: docker-sock
+              mountPath: /var/run/docker.sock
+              readOnly: true
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: reproxy-logs
+        - name: ssl
+          persistentVolumeClaim:
+            claimName: reproxy-ssl
+        - name: docker-sock
+          hostPath:
+            path: /var/run/docker.sock
