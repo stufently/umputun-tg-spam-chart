@@ -1,0 +1,5 @@
+apiVersion: v2
+name: tg-spam
+description: Helm chart to deploy tg-spam and reproxy
+version: 0.1.0
+appVersion: "latest"

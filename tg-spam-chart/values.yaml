@@ -1,0 +1,19 @@
+tgspam:
+  image: ghcr.io/umputun/tg-spam:latest
+  env:
+    TELEGRAM_TOKEN: ""          
+    TELEGRAM_GROUP: "-1002843099212"
+    TZ: "America/Chicago"
+    ADMIN_GROUP: "-4660067109"
+    LOGGER_ENABLED: "true"
+    LOGGER_FILE: "/srv/logs/tg-spam.log"
+    LOGGER_MAX_SIZE: "5M"
+    NO_SPAM_REPLY: "true"
+    SERVER_ENABLED: "true"
+  args: ["--super=user1","--super=user2"]   
+  volumeMountPath: /srv/data
+
+storage:
+  tgDataSize: 1Gi
+  reproxyLogsSize: 500Mi
+  reproxySSLSize: 500Mi

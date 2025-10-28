@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tg-spam
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tg-spam
+  template:
+    metadata:
+      labels:
+        app: tg-spam
+    spec:
+      containers:
+        - name: tg-spam
+          image: {{ .Values.tgspam.image }}
+          env:
+            - name: TELEGRAM_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: tg-spam-secret
+                  key: TELEGRAM_TOKEN
+            {{- range $key, $value := .Values.tgspam.env }}
+            {{- if ne $key "TELEGRAM_TOKEN" }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+            {{- end }}
+          args: {{ .Values.tgspam.args }}
+          volumeMounts:
+            - name: tg-data
+              mountPath: {{ .Values.tgspam.volumeMountPath }}
+      volumes:
+        - name: tg-data
+          persistentVolumeClaim:
+            claimName: tg-data
