@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 tgspam:
   image: ghcr.io/umputun/tg-spam:latest
   env:
@@ -11,55 +10,10 @@ tgspam:
     LOGGER_MAX_SIZE: "5M"
     NO_SPAM_REPLY: "true"
     SERVER_ENABLED: "true"
-  args: ["--super=user1","--super=user2"]   
+  args: ["--super=user1", "--super=user2"]
   volumeMountPath: /srv/data
 
 storage:
   tgDataSize: 1Gi
-  reproxyLogsSize: 500Mi
-  reproxySSLSize: 500Mi
-=======
-tgspam:
-  image: ghcr.io/umputun/tg-spam:latest
-  env:
-    TELEGRAM_TOKEN: ""          
-    TELEGRAM_GROUP: "-1002843099212"
-    TZ: "America/Chicago"
-    ADMIN_GROUP: "-4660067109"
-    LOGGER_ENABLED: "true"
-    LOGGER_FILE: "/srv/logs/tg-spam.log"
-    LOGGER_MAX_SIZE: "5M"
-    NO_SPAM_REPLY: "true"
-    SERVER_ENABLED: "true"
-  args: ["--super=user1","--super=user2"]   
-  volumeMountPath: /srv/data
 
-reproxy:
-  image: ghcr.io/umputun/reproxy:latest
-  env:
-    TZ: "America/Chicago"
-    DOCKER_ENABLED: "true"
-    SSL_TYPE: "none"
-    SSL_ACME_EMAIL: "user@mail.com"
-    SSL_ACME_FQDN: "example.com"
-    SSL_ACME_LOCATION: "/srv/ssl"
-    LOGGER_ENABLED: "true"
-    LOGGER_FILE: "/srv/logs/access.log"
-    LOGGER_STDOUT: "true"
-    DEBUG: "true"
-    AUTH_ENABLED: "false"
-    AUTH_USER: ""
-    AUTH_PASSWORD: ""
-  ports:
-    - name: http
-      port: 80
-      targetPort: 8080
-    - name: https
-      port: 443
-      targetPort: 8443
 
-storage:
-  tgDataSize: 1Gi
-  reproxyLogsSize: 500Mi
-  reproxySSLSize: 500Mi
->>>>>>> origin/main
