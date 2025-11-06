@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -9,41 +8,3 @@ spec:
   resources:
     requests:
       storage: {{ .Values.storage.tgDataSize }}
-
-
-=======
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: tg-data
-spec:
-  accessModes: [ "ReadWriteOnce" ]
-  storageClassName: standard
-  resources:
-    requests:
-      storage: {{ .Values.storage.tgDataSize }}
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: reproxy-logs
-spec:
-  accessModes: [ "ReadWriteOnce" ]
-  storageClassName: standard
-  resources:
-    requests:
-      storage: {{ .Values.storage.reproxyLogsSize }}
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: reproxy-ssl
-spec:
-  accessModes: [ "ReadWriteOnce" ]
-  storageClassName: standard
-  resources:
-    requests:
-      storage: {{ .Values.storage.reproxySSLSize }}
->>>>>>> origin/main
