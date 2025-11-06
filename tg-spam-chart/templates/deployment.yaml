@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}
+  annotations:
+    {{- with .Values.labels }}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+
+      initContainers:
+        - name: init-permissions
+          image: busybox
+          command: ["sh", "-c", "chown -R 1000:1000 /srv/data"]
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          volumeMounts:
+            - name: tg-data
+              mountPath: {{ .Values.tgspam.volumeMountPath }}
+
+      containers:
+        - name: tg-spam
+          image: {{ .Values.tgspam.image }}
+          env:
+            - name: TELEGRAM_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secretName | default "tg-spam-secret" }}
+                  key: {{ .Values.tgspam.env.TELEGRAM_TOKEN_KEY }}
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secretName | default "tg-spam-bots-secret" }}
+                  key: OPENAI_API_KEY
+            {{- range $key, $value := .Values.tgspam.env }}
+            {{- if and (ne $key "TELEGRAM_TOKEN_KEY") (ne $key "OPENAI_API_KEY") }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+            {{- end }}
+          args:
+{{ toYaml .Values.tgspam.args | indent 12 }}
+          volumeMounts:
+            - name: tg-data
+              mountPath: {{ .Values.tgspam.volumeMountPath }}
+
+      volumes:
+        - name: tg-data
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-tg-data

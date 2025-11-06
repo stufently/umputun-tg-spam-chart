@@ -1,0 +1,37 @@
+tgspam:
+  image: ghcr.io/umputun/tg-spam:latest
+  env:
+    TELEGRAM_GROUP: ""
+    OPENAI_API_KEY: ""
+    TZ: "America/Chicago"
+    ADMIN_GROUP: ""
+    LOGGER_ENABLED: "true"
+    LOGGER_FILE: "/tmp/tg-spam.log"
+    LOGGER_MAX_SIZE: "5M"
+    NO_SPAM_REPLY: "true"
+    SERVER_ENABLED: "true"
+    MAX_EMOJI: "3"
+    META_LINKS_LIMIT: "3"
+    META_USERNAME_SYMBOLS: "@"
+    MIN_MSG_LEN: "10"
+    DEBUG: "true"
+    MULTI_LANG: "2"
+    META_KEYBOARD: "true"
+
+  args:
+    - "--server.auth="          
+    - "--super=user1"
+    - "--super=user2"
+  volumeMountPath: /srv/data
+
+# Secret name for bot credentials (override in custom values)
+secretName: tg-spam-bots-secret
+
+
+
+storage:
+  tgDataSize: 1Gi
+  storageClass: hcloud-volumes
+
+
+
