@@ -19,7 +19,7 @@ spec:
             - name: TELEGRAM_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: tg-spam-secret
+                  name: {{ .Values.tgspam.secretName }}
                   key: TELEGRAM_TOKEN
             {{- range $key, $value := .Values.tgspam.env }}
             {{- if ne $key "TELEGRAM_TOKEN" }}
