@@ -1,5 +1,6 @@
 tgspam:
   image: ghcr.io/umputun/tg-spam:latest
+  secretName: tg-spam-bots-secret
   env:
     TELEGRAM_TOKEN: ""          
     TELEGRAM_GROUP: "-1002843099212"
