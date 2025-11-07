@@ -13,6 +13,12 @@ tgspam:
     MULTI_LANG: "2"
     META_KEYBOARD: "true"
   volumeMountPath: /srv/data
+  # Настройки безопасности для работы с PVC
+  fsGroup: 1000  # GID для fsGroup (обычно 1000 для пользователя app)
+  runAsUser: 1000  # UID пользователя в контейнере
+  runAsGroup: 1000  # GID группы в контейнере
+  initContainer:
+    enabled: true  # Включить initContainer для установки прав на PVC
 
 storage:
   tgDataSize: 1Gi

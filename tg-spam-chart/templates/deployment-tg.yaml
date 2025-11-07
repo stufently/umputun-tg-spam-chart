@@ -14,16 +14,35 @@ spec:
       labels:
         app: {{ .Release.Name }}
     spec:
+      securityContext:
+        fsGroup: {{ .Values.tgspam.fsGroup | default 1000 }}
+{{- if .Values.tgspam.initContainer.enabled }}
+      initContainers:
+        - name: volume-permissions
+          image: busybox:latest
+          command:
+            - sh
+            - -c
+            - chown -R {{ .Values.tgspam.fsGroup | default 1000 }}:{{ .Values.tgspam.fsGroup | default 1000 }} {{ .Values.tgspam.volumeMountPath }} && chmod -R 755 {{ .Values.tgspam.volumeMountPath }}
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: tg-data
+              mountPath: {{ .Values.tgspam.volumeMountPath }}
+{{- end }}
       containers:
         - name: tg-spam
           image: {{ .Values.tgspam.image }}
+          securityContext:
+            runAsUser: {{ .Values.tgspam.runAsUser | default 1000 }}
+            runAsGroup: {{ .Values.tgspam.runAsGroup | default 1000 }}
           env:
-            {{- if .Values.tgspam.env }}
-            {{- range $key, $value := .Values.tgspam.env }}
+{{- if .Values.tgspam.env }}
+{{- range $key, $value := .Values.tgspam.env }}
             - name: {{ $key }}
               value: {{ $value | quote }}
-            {{- end }}
-            {{- end }}
+{{- end }}
+{{- end }}
             - name: OPENAI_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -37,4 +56,3 @@ spec:
         - name: tg-data
           persistentVolumeClaim:
             claimName: {{ .Release.Name }}-tg-data
-
