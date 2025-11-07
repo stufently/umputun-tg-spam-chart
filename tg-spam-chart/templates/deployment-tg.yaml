@@ -29,14 +29,12 @@ spec:
             {{- end }}
             {{- end }}
             {{- end }}
-            {{- if .Values.tgspam.secretName }}
             - name: OPENAI_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.tgspam.secretName }}
+                  name: openai-secret
                   key: OPENAI_TOKEN
                   optional: true
-            {{- end }}
           {{- if and .Values.tgspam.args (gt (len .Values.tgspam.args) 0) }}
           args:
             {{- range .Values.tgspam.args }}
