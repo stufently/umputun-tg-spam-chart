@@ -3,6 +3,8 @@ tgspam:
   env:
     TELEGRAM_TOKEN: ""  # Токен бота от @BotFather
     ADMIN_GROUP: ""
+    # Настройки OpenAI
+    OPENAI_MODEL: "gpt-5-mini"  # Модель OpenAI (gpt-5-mini, gpt-4o-mini и т.д.)
     # Настройки спама и прочее
     MAX_EMOJI: "3"
     META_LINKS_LIMIT: "3"

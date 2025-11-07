@@ -1,6 +1,6 @@
 apiVersion: v2
 name: tg-spam
 description: Helm chart to deploy tg-spam bot
-version: 0.1.5
+version: 0.1.6
 appVersion: "latest"
 
