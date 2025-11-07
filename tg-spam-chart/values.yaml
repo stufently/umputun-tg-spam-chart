@@ -12,7 +12,7 @@ tgspam:
     DEBUG: "true"
     MULTI_LANG: "2"
     META_KEYBOARD: "true"
-  volumeMountPath: /var/srv/data
+  volumeMountPath: /srv/data
 
 storage:
   tgDataSize: 1Gi
