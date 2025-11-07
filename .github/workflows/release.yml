@@ -43,9 +43,28 @@ jobs:
         run: |
           helm package tg-spam-chart --destination ./packages
 
+      - name: List packaged files
+        run: |
+          ls -la ./packages/
+
       - name: Create index
         run: |
-          helm repo index ./packages --url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+          REPO_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name || github.repository }}"
+          echo "Repository URL: $REPO_URL"
+          helm repo index ./packages --url "$REPO_URL"
+          echo "Index file contents:"
+          cat ./packages/index.yaml
+
+      - name: Verify files before deployment
+        run: |
+          echo "Files to be deployed:"
+          ls -lah ./packages/
+          echo ""
+          echo "Checking index.yaml exists:"
+          test -f ./packages/index.yaml && echo "✓ index.yaml found" || echo "✗ index.yaml missing"
+          echo ""
+          echo "Checking chart package exists:"
+          test -f ./packages/*.tgz && echo "✓ Chart package found" || echo "✗ Chart package missing"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
