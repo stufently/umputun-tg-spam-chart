@@ -57,6 +57,36 @@ jobs:
           echo "Index file contents:"
           cat ./packages/index.yaml
 
+      - name: Create index.html
+        run: |
+          REPO_NAME="${{ github.event.repository.name || github.repository }}"
+          REPO_OWNER="${{ github.repository_owner }}"
+          {
+            echo '<!DOCTYPE html>'
+            echo '<html>'
+            echo '<head>'
+            echo '  <title>Helm Chart Repository</title>'
+            echo '  <meta charset="utf-8">'
+            echo '  <style>'
+            echo '    body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }'
+            echo '    h1 { color: #333; }'
+            echo '    code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; }'
+            echo '    pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }'
+            echo '  </style>'
+            echo '</head>'
+            echo '<body>'
+            echo '  <h1>Helm Chart Repository</h1>'
+            echo '  <p>This is a Helm chart repository for <code>tg-spam-chart</code>.</p>'
+            echo '  <h2>Usage</h2>'
+            echo '  <pre>helm repo add umputun-tg-spam https://'"${REPO_OWNER}"'.github.io/'"${REPO_NAME}"'
+          helm repo update
+          helm search repo umputun-tg-spam</pre>'
+            echo '  <h2>Repository Index</h2>'
+            echo '  <p><a href="index.yaml">View index.yaml</a></p>'
+            echo '</body>'
+            echo '</html>'
+          } > ./packages/index.html
+
       - name: Verify files before deployment
         run: |
           echo "Files to be deployed:"
@@ -64,6 +94,9 @@ jobs:
           echo ""
           echo "Checking index.yaml exists:"
           test -f ./packages/index.yaml && echo "✓ index.yaml found" || echo "✗ index.yaml missing"
+          echo ""
+          echo "Checking index.html exists:"
+          test -f ./packages/index.html && echo "✓ index.html found" || echo "✗ index.html missing"
           echo ""
           echo "Checking chart package exists:"
           test -f ./packages/*.tgz && echo "✓ Chart package found" || echo "✗ Chart package missing"
