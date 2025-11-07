@@ -14,6 +14,8 @@ tgspam:
   args: ["--super=user1", "--super=user2"]
   volumeMountPath: /srv/data
 
+secretName: tg-spam-bots-secret
+
 storage:
   tgDataSize: 1Gi
 
