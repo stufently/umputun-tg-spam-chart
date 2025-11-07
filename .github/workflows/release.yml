@@ -9,13 +9,21 @@ on:
       - 'tg-spam-chart/**'
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pages: write
-      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
       - name: Checkout code
@@ -28,6 +36,9 @@ jobs:
         with:
           version: 'latest'
 
+      - name: Create packages directory
+        run: mkdir -p ./packages
+
       - name: Package chart
         run: |
           helm package tg-spam-chart --destination ./packages
@@ -36,10 +47,15 @@ jobs:
         run: |
           helm repo index ./packages --url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./packages
-          keep_files: true
+          path: ./packages
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
 
