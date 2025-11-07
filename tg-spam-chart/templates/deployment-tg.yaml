@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tg-spam
+  name: {{ .Release.Name }}
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app: tg-spam
+      app: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: tg-spam
+        app: {{ .Release.Name }}
     spec:
       containers:
         - name: tg-spam
