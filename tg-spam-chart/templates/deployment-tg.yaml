@@ -16,18 +16,18 @@ spec:
         - name: tg-spam
           image: {{ .Values.tgspam.image }}
           env:
+            {{- if .Values.tgspam.env }}
+            {{- range $key, $value := .Values.tgspam.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- end }}
             - name: OPENAI_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: openai-secret
                   key: OPENAI_TOKEN
                   optional: true
-          {{- if and .Values.tgspam.args (gt (len .Values.tgspam.args) 0) }}
-          args:
-            {{- range .Values.tgspam.args }}
-            - {{ . }}
-            {{- end }}
-          {{- end }}
           volumeMounts:
             - name: tg-data
               mountPath: {{ .Values.tgspam.volumeMountPath }}
