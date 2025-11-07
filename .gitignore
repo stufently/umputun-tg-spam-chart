@@ -1,0 +1,10 @@
+# Helm packages
+*.tgz
+packages/
+
+# Temporary files
+.DS_Store
+*.swp
+*.swo
+*~
+
