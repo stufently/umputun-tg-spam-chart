@@ -16,5 +16,6 @@ tgspam:
 
 storage:
   tgDataSize: 1Gi
+  storageClass: "hcloud-volumes"  # Оставьте пустым для использования default StorageClass, или укажите нужный (например: "hcloud-volumes")
 
 

@@ -1,10 +1,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: tg-data
+  name: {{ .Release.Name }}-tg-data
 spec:
   accessModes: [ "ReadWriteOnce" ]
-  storageClassName: standard
+  {{- if .Values.storage.storageClass }}
+  storageClassName: {{ .Values.storage.storageClass }}
+  {{- end }}
   resources:
     requests:
       storage: {{ .Values.storage.tgDataSize }}

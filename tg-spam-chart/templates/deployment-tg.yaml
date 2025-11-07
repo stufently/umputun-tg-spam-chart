@@ -36,5 +36,5 @@ spec:
       volumes:
         - name: tg-data
           persistentVolumeClaim:
-            claimName: tg-data
+            claimName: {{ .Release.Name }}-tg-data
 
