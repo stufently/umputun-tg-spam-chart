@@ -1,7 +1,7 @@
 tgspam:
   image: ghcr.io/umputun/tg-spam:latest
-  secretName: tg-spam-bots-secret
   env:
+    TELEGRAM_TOKEN: ""  # Токен бота от @BotFather
     ADMIN_GROUP: ""
     # Настройки спама и прочее
     MAX_EMOJI: "3"
@@ -13,8 +13,6 @@ tgspam:
     MULTI_LANG: "2"
     META_KEYBOARD: "true"
   volumeMountPath: /var/srv/data
-
-secretName: tg-spam-bots-secret
 
 storage:
   tgDataSize: 1Gi
