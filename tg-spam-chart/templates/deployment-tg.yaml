@@ -21,13 +21,28 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.tgspam.secretName }}
                   key: TELEGRAM_TOKEN
+            {{- if .Values.tgspam.env }}
             {{- range $key, $value := .Values.tgspam.env }}
-            {{- if ne $key "TELEGRAM_TOKEN" }}
+            {{- if and (ne $key "TELEGRAM_TOKEN") (ne $key "OPENAI_TOKEN") }}
             - name: {{ $key }}
               value: "{{ $value }}"
             {{- end }}
             {{- end }}
-          args: {{ .Values.tgspam.args }}
+            {{- end }}
+            {{- if .Values.tgspam.secretName }}
+            - name: OPENAI_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.tgspam.secretName }}
+                  key: OPENAI_TOKEN
+                  optional: true
+            {{- end }}
+          {{- if and .Values.tgspam.args (gt (len .Values.tgspam.args) 0) }}
+          args:
+            {{- range .Values.tgspam.args }}
+            - {{ . }}
+            {{- end }}
+          {{- end }}
           volumeMounts:
             - name: tg-data
               mountPath: {{ .Values.tgspam.volumeMountPath }}

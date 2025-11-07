@@ -2,17 +2,17 @@ tgspam:
   image: ghcr.io/umputun/tg-spam:latest
   secretName: tg-spam-bots-secret
   env:
-    TELEGRAM_TOKEN: ""          
-    TELEGRAM_GROUP: "-1002843099212"
-    TZ: "America/Chicago"
     ADMIN_GROUP: "-4660067109"
-    LOGGER_ENABLED: "true"
-    LOGGER_FILE: "/srv/logs/tg-spam.log"
-    LOGGER_MAX_SIZE: "5M"
+    # Настройки спама и прочее
+    MAX_EMOJI: "3"
+    META_LINKS_LIMIT: "3"
+    META_USERNAME_SYMBOLS: "@"
     NO_SPAM_REPLY: "true"
-    SERVER_ENABLED: "true"
-  args: ["--super=user1", "--super=user2"]
-  volumeMountPath: /srv/data
+    MIN_MSG_LEN: "10"
+    DEBUG: "true"
+    MULTI_LANG: "2"
+    META_KEYBOARD: "true"
+  volumeMountPath: /var/srv/data
 
 secretName: tg-spam-bots-secret
 
