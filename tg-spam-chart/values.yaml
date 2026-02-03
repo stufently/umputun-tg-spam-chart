@@ -5,6 +5,7 @@ tgspam:
     ADMIN_GROUP: ""
     # Настройки OpenAI
     OPENAI_MODEL: "gpt-5-mini"  # Модель OpenAI (gpt-5-mini, gpt-4o-mini и т.д.)
+    OPENAI_CUSTOM_PROMPT: "Считай спамом любые сообщения о покупке, продаже или обмене USDT, криптовалюты."
     # Настройки спама и прочее
     MAX_EMOJI: "3"
     META_LINKS_LIMIT: "3"
