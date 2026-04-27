@@ -42,6 +42,30 @@ spec:
             - name: http
               containerPort: {{ .Values.tgspam.service.port | default 8080 }}
               protocol: TCP
+{{- if and .Values.tgspam.livenessProbe .Values.tgspam.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: http
+            initialDelaySeconds: {{ .Values.tgspam.livenessProbe.initialDelaySeconds | default 30 }}
+            periodSeconds: {{ .Values.tgspam.livenessProbe.periodSeconds | default 30 }}
+            timeoutSeconds: {{ .Values.tgspam.livenessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.tgspam.livenessProbe.failureThreshold | default 3 }}
+{{- end }}
+{{- if and .Values.tgspam.readinessProbe .Values.tgspam.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: http
+            initialDelaySeconds: {{ .Values.tgspam.readinessProbe.initialDelaySeconds | default 5 }}
+            periodSeconds: {{ .Values.tgspam.readinessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.tgspam.readinessProbe.timeoutSeconds | default 3 }}
+            failureThreshold: {{ .Values.tgspam.readinessProbe.failureThreshold | default 3 }}
+{{- end }}
+{{- end }}
+{{- with .Values.tgspam.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
 {{- end }}
           env:
 {{- if .Values.tgspam.env }}

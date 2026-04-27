@@ -31,6 +31,26 @@ tgspam:
   service:
     enabled: true
     port: 8080
+  # Probes используют /ping (без BasicAuth, ставится до auth middleware).
+  # Требуют SERVER_ENABLED=true. Если HTTP сервер выключен — отключи здесь probes.
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+  resources:
+    requests:
+      cpu: 50m
+      memory: 96Mi
+    limits:
+      memory: 256Mi
   volumeMountPath: /srv/data
   # Настройки безопасности для работы с PVC
   fsGroup: 1000  # GID для fsGroup (обычно 1000 для пользователя app)
