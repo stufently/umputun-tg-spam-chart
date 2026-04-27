@@ -1,5 +1,10 @@
 tgspam:
-  image: ghcr.io/umputun/tg-spam:latest
+  image:
+    repository: ghcr.io/umputun/tg-spam
+    # Если пусто — берётся `Chart.appVersion` (рекомендуемый способ — bumpить тег через
+    # release чарта, а не override'ить в values/AppSet)
+    tag: ""
+    pullPolicy: IfNotPresent
   # Имя k8s Secret с дополнительными ENV (например TELEGRAM_TOKEN из VSO/Vault).
   # Поддерживается tpl-рендеринг — можно использовать `{{ .Release.Name }}`.
   # Пустая строка = не подключать envFrom.

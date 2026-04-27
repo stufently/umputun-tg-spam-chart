@@ -32,7 +32,8 @@ spec:
 {{- end }}
       containers:
         - name: tg-spam
-          image: {{ .Values.tgspam.image }}
+          image: "{{ .Values.tgspam.image.repository }}:{{ .Values.tgspam.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.tgspam.image.pullPolicy | default "IfNotPresent" }}
           securityContext:
             runAsUser: {{ .Values.tgspam.runAsUser | default 1000 }}
             runAsGroup: {{ .Values.tgspam.runAsGroup | default 1000 }}
