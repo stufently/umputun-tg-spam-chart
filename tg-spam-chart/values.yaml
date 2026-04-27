@@ -15,6 +15,14 @@ tgspam:
     DEBUG: "true"
     MULTI_LANG: "2"
     META_KEYBOARD: "true"
+    # HTTP server для blackbox /ping (только внутри кластера, ClusterIP)
+    # /ping доступен без BasicAuth (rest.Ping middleware ставится до auth)
+    SERVER_ENABLED: "true"
+    SERVER_LISTEN: ":8080"
+  # Service для blackbox HTTP probe внутри кластера
+  service:
+    enabled: true
+    port: 8080
   volumeMountPath: /srv/data
   # Настройки безопасности для работы с PVC
   fsGroup: 1000  # GID для fsGroup (обычно 1000 для пользователя app)

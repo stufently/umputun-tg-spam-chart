@@ -1,0 +1,17 @@
+{{- if and .Values.tgspam.service .Values.tgspam.service.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: {{ .Values.tgspam.service.port | default 8080 }}
+      targetPort: http
+      protocol: TCP
+  selector:
+    app: {{ .Release.Name }}
+{{- end }}
