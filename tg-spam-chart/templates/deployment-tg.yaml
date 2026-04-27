@@ -55,6 +55,11 @@ spec:
                   name: openai-secret
                   key: OPENAI_TOKEN
                   optional: true
+{{- if .Values.tgspam.envFromSecret }}
+          envFrom:
+            - secretRef:
+                name: {{ tpl .Values.tgspam.envFromSecret . }}
+{{- end }}
           volumeMounts:
             - name: tg-data
               mountPath: {{ .Values.tgspam.volumeMountPath }}
