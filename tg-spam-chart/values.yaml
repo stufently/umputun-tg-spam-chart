@@ -11,19 +11,43 @@ tgspam:
   envFromSecret: "{{ .Release.Name }}"
   env:
     ADMIN_GROUP: ""
-    # Настройки OpenAI
+    # ── OpenAI ──────────────────────────────────────────────────────────────
     OPENAI_MODEL: "gpt-5-mini"  # Модель OpenAI (gpt-5-mini, gpt-4o-mini и т.д.)
-    OPENAI_CUSTOM_PROMPT: "Считай спамом любые сообщения о покупке, продаже или обмене USDT, криптовалюты."
-    # Настройки спама и прочее
+    # ВАЖНО: OPENAI_CUSTOM_PROMPT парсится как список с разделителем "," (env-delim).
+    # Поэтому НЕ ставим запятые внутри одного паттерна — каждый сегмент между
+    # запятыми становится отдельным custom-prompt'ом, добавляемым к базовому.
+    OPENAI_CUSTOM_PROMPT: "Спам: предложения быстрого заработка или удалённой работы с обещанием большого дохода,Спам: набор в команду партнёрку или реферальную/сетевую схему,Спам: реклама онлайн-казино ставок и азартных игр,Спам: интим-услуги эскорт и контент 18+,Спам: продажа или накрутка подписчиков аккаунтов и просмотров,Спам: покупка продажа обмен или инвестиции в криптовалюту и USDT,Спам: призыв написать в личку или в другой телеграм/ват сап за деталями"
+    OPENAI_HISTORY_SIZE: "5"            # контекст последних N сообщений для LLM — меньше ложных срабатываний
+    OPENAI_CHECK_SHORT_MESSAGES: "true" # OpenAI добивает короткие сообщения (увеличивает расход API)
+    # ── Базовые проверки ────────────────────────────────────────────────────
     MAX_EMOJI: "3"
-    META_LINKS_LIMIT: "3"
-    META_USERNAME_SYMBOLS: "@"
-    NO_SPAM_REPLY: "true"
-    MIN_MSG_LEN: "10"
-    DEBUG: "true"
     MULTI_LANG: "2"
+    MIN_MSG_LEN: "30"                  # < этого порога — большинство проверок пропускают (OpenAI добивает)
+    NO_SPAM_REPLY: "true"
+    DEBUG: "false"
+    # ── Meta-проверки (структура сообщения) ──────────────────────────────────
+    META_LINKS_LIMIT: "3"
+    META_MENTIONS_LIMIT: "5"          # > N упоминаний @username → спам
+    META_USERNAME_SYMBOLS: "@"
     META_KEYBOARD: "true"
-    # HTTP server для blackbox /ping (только внутри кластера, ClusterIP)
+    META_IMAGE_ONLY: "true"           # фото с подписью < MIN_MSG_LEN → спам
+    META_VIDEO_ONLY: "true"           # видео с подписью < MIN_MSG_LEN → спам
+    META_FORWARD: "true"             # любой форвард от неодобренного → спам
+    META_GIVEAWAY: "true"            # розыгрыши → спам
+    # ── Поведенческие проверки ───────────────────────────────────────────────
+    DUPLICATES_THRESHOLD: "3"        # N идентичных сообщений в окне → спам (работает и для approved)
+    DUPLICATES_WINDOW: "1h"
+    REACTIONS_MAX_REACTIONS: "20"    # боты, которые только массово реагируют
+    REACTIONS_WINDOW: "1h"
+    SPACE_ENABLED: "true"            # разбивка текста пробелами в обход классификатора
+    # ── Реакция на спам / чистка ──────────────────────────────────────────────
+    AGGRESSIVE_CLEANUP: "true"       # при бане через /spam удалять недавние сообщения спамера
+    REPORT_ENABLED: "true"           # жалобы от одобренных юзеров → уведомление в админ-чат
+    REPORT_THRESHOLD: "2"            # сколько жалоб до уведомления админа (авто-бан НЕ включён)
+    DELETE_JOIN_MESSAGES: "true"     # удалять служебные "вступил в группу"
+    DELETE_LEAVE_MESSAGES: "true"    # удалять служебные "покинул группу"
+    SUPPRESS_JOIN_MESSAGE: "true"    # удалять join-сообщение при бане спамера
+    # ── HTTP server для blackbox /ping (только внутри кластера, ClusterIP) ────
     # /ping доступен без BasicAuth (rest.Ping middleware ставится до auth)
     SERVER_ENABLED: "true"
     SERVER_LISTEN: ":8080"

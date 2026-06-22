@@ -41,6 +41,24 @@ jobs:
       - name: Create packages directory
         run: mkdir -p ./packages
 
+      - name: Fetch previously published charts
+        # GitHub Pages deploy заменяет весь сайт содержимым ./packages, а
+        # `helm repo index` строит index заново только из локальных пакетов.
+        # Чтобы не выкинуть старые версии чарта из repo (ломает rollback на
+        # запинённую версию), подтягиваем ранее опубликованные index.yaml и
+        # .tgz в ./packages и затем сливаем индекс через --merge.
+        run: |
+          REPO_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name || github.repository }}"
+          if curl -fsSL "$REPO_URL/index.yaml" -o ./packages/old-index.yaml; then
+            echo "Existing index found, downloading referenced charts:"
+            grep -Eo 'https?://[^ ]+\.tgz' ./packages/old-index.yaml | sort -u | while read -r url; do
+              echo "  - $url"
+              curl -fsSL "$url" -O --output-dir ./packages || echo "    (skip: $url unavailable)"
+            done
+          else
+            echo "No existing index.yaml (first publish)"
+          fi
+
       - name: Package chart
         run: |
           helm package tg-spam-chart --destination ./packages
@@ -53,7 +71,12 @@ jobs:
         run: |
           REPO_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name || github.repository }}"
           echo "Repository URL: $REPO_URL"
-          helm repo index ./packages --url "$REPO_URL"
+          if [ -f ./packages/old-index.yaml ]; then
+            helm repo index ./packages --url "$REPO_URL" --merge ./packages/old-index.yaml
+            rm -f ./packages/old-index.yaml
+          else
+            helm repo index ./packages --url "$REPO_URL"
+          fi
           echo "Index file contents:"
           cat ./packages/index.yaml
 
