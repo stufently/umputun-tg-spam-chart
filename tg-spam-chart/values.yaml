@@ -12,7 +12,7 @@ tgspam:
   env:
     ADMIN_GROUP: ""
     # ── OpenAI ──────────────────────────────────────────────────────────────
-    OPENAI_MODEL: "gpt-5.4-mini"  # Модель OpenAI (gpt-5.4-mini — актуальная mini; gpt-5.5-mini не выпущен)
+    OPENAI_MODEL: "gpt-5.6-luna"  # Reasoning-модель. tg-spam НЕ шлёт temperature (omitempty на zero-value в go-openai) → luna не 400-ит на temperature; gpt-5.x уже роутится в MaxCompletionTokens (isReasoningModel)
     # ВАЖНО: OPENAI_CUSTOM_PROMPT парсится как список с разделителем "," (env-delim).
     # Поэтому НЕ ставим запятые внутри одного паттерна — каждый сегмент между
     # запятыми становится отдельным custom-prompt'ом, добавляемым к базовому.
