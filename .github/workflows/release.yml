@@ -31,10 +31,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Third-party экшен запинен по commit-SHA (тег v3 — mutable), а версия
+      # helm — конкретная вместо 'latest': пакетирование чарта не должно
+      # меняться из-за апстрим-релиза helm в момент публикации.
       - name: Set up Helm
-        uses: azure/setup-helm@v3
+        uses: azure/setup-helm@5119fcb9089d432beecbf79bb2c7915207344b78 # v3.5
         with:
-          version: 'latest'
+          version: 'v4.2.2'  # ровно то, что скачал последний успешный релиз чарта (run 28707434695, 2026-07-04)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -48,13 +51,24 @@ jobs:
         # запинённую версию), подтягиваем ранее опубликованные index.yaml и
         # .tgz в ./packages и затем сливаем индекс через --merge.
         run: |
+          set -euo pipefail
           REPO_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name || github.repository }}"
           if curl -fsSL "$REPO_URL/index.yaml" -o ./packages/old-index.yaml; then
             echo "Existing index found, downloading referenced charts:"
-            grep -Eo 'https?://[^ ]+\.tgz' ./packages/old-index.yaml | sort -u | while read -r url; do
+            grep -Eo 'https?://[^ ]+\.tgz' ./packages/old-index.yaml | sort -u > ./old-charts.txt || true
+            # FAIL-CLOSED (2026-07-25): раньше здесь стояло `curl … || echo skip`.
+            # Одна временная сетевая ошибка молча выкидывала уже опубликованный
+            # .tgz: Pages заменяется каталогом БЕЗ него, а merged index на него
+            # по-прежнему ссылается => ArgoCD не может вытянуть запинённую версию
+            # чарта. Лучше громко упасть и не публиковать вовсе.
+            # Цикл читает из файла (не из пайпа), чтобы `set -e` реально работал.
+            while read -r url; do
+              [ -n "$url" ] || continue
               echo "  - $url"
-              curl -fsSL "$url" -O --output-dir ./packages || echo "    (skip: $url unavailable)"
-            done
+              curl -fsSL --retry 3 --retry-all-errors --retry-delay 2 "$url" -O --output-dir ./packages
+              test -s "./packages/$(basename "$url")"
+            done < ./old-charts.txt
+            rm -f ./old-charts.txt
           else
             echo "No existing index.yaml (first publish)"
           fi

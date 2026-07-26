@@ -82,6 +82,14 @@ tgspam:
   runAsGroup: 1000  # GID группы в контейнере
   initContainer:
     enabled: true  # Включить initContainer для установки прав на PVC
+    # Образ initContainer'а. Пин обязателен: было `busybox:latest`, т.е. при
+    # каждом пересоздании пода мог приезжать другой upstream-образ с root-правами
+    # на PVC. Ссылка тег+дайджест: тег читаемый, дайджест неизменяемый (сам тег
+    # 1.38.0 апстрим тоже может переписать). Это РОВНО тот образ, что сейчас
+    # крутится в кластере — дайджест взят из .status.initContainerStatuses
+    # боевого tg-spam-adpattaya (2026-07-25). Дайджест мультиарховый (index),
+    # так что arm64/amd64 продолжают работать.
+    image: "busybox:1.38.0@sha256:fd8d9aa63ba2f0982b5304e1ee8d3b90a210bc1ffb5314d980eb6962f1a9715d"
 
 storage:
   tgDataSize: 1Gi
