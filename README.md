@@ -63,6 +63,26 @@ helm repo index . --url https://ORG.github.io/umputun-tg-spam-chart
 версии публикация безопасна: старая версия продолжает обслуживать кластер, пока
 `targetRevision` не поднимут вручную в `romtk3s`.
 
+⚠️ **`[skip ci]` в коммите по `tg-spam-chart/**` = чарт НЕ опубликован.** Грабля
+2026-07-26: коммит «Pin busybox digest, chart 0.8.0 [skip ci]» поднял `version` в
+`Chart.yaml`, но workflow не запустился, поэтому в `index.yaml` максимум остался
+`0.7.0`, а `targetRevision` в `romtk3s` продолжал (корректно) указывать на `0.7.0`.
+Расхождение «локальный Chart.yaml новее опубликованного index» безопасно, но легко
+принять за поломку. **Перед сменой `targetRevision` в `romtk3s` всегда проверяй
+факт публикации:** `curl -s https://stufently.github.io/umputun-tg-spam-chart/index.yaml`
+— нужной версии там нет, значит её нет и для ArgoCD.
+
+### Версия образа tg-spam
+
+Тег апстрим-образа `ghcr.io/umputun/tg-spam` берётся из `Chart.appVersion`
+(`tgspam.image.tag` пустой). Порядок апгрейда апстрима:
+
+1. `appVersion` → новый тег, `version` → бамп (обязательно, см. выше);
+2. push БЕЗ `[skip ci]`, дождаться workflow и появления версии в `index.yaml`;
+3. только после этого поднять `targetRevision` в
+   `romtk3s/tg-spam/tg-spam-appset.yaml` — ArgoCD (automated+selfHeal, strategy
+   `Recreate`) сам перекатит все 10 деплойментов.
+
 ### Пины (воспроизводимость)
 
 - `tgspam.initContainer.image` — образ initContainer'а, по умолчанию
