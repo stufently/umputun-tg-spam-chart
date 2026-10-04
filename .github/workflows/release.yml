@@ -31,11 +31,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Third-party экшен запинен по commit-SHA (тег v3 — mutable), а версия
+      # Third-party экшен запинен по commit-SHA (тег v5 — mutable), а версия
       # helm — конкретная вместо 'latest': пакетирование чарта не должно
       # меняться из-за апстрим-релиза helm в момент публикации.
       - name: Set up Helm
-        uses: azure/setup-helm@5119fcb9089d432beecbf79bb2c7915207344b78 # v3.5
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
         with:
           version: 'v4.2.2'  # ровно то, что скачал последний успешный релиз чарта (run 28707434695, 2026-07-04)
         env:
